@@ -22,28 +22,21 @@ custom_pattern_matcher % RUST_LOG=info cargo run --release
 ### Defining Patterns
 The Log Extractor uses custom patterns to define the structure of log messages. The general pattern is `<key_name:data_type>`.Since this is just for the experiment, only couple of datatypes are available. You can specify placeholders like `<log_level:word>`, `<username:word>`, `<ip_address:ip>`, and `<log_time:date_time>`, and the extractor will attempt to match and extract information accordingly.
 
-### Examples
-#### test Case 1
-```rust
-let test_string_1 = "[INFO] User alice logged in from IP address 192.168.1.10.";
-let test_pattern_1 = "[<log_level:word>] User <username:word> logged in from IP address <ip_address:ip>.";
-```
 
-#### Output
-```rust
-[Matched { key: "log_level", value: "INFO" }, Matched { key: "username", value: "alice" }, Matched { key: "ip_address", value: "192.168.1.10" }]
-```
-
-#### test Case 2
-```rust
-let test_string_2 = "2024-01-14 12:34:56 [INFO] User alice logged in from IP address 192.168.1.10.";
-let test_pattern_2 = "<log_time:date_time> [<log_level:word>] User <username:word> logged in from IP address <ip_address:ip>.";
-
-```
-
-#### Output
-```rust
-[Matched { key: "log_time", value: "2024-01-14 12:34:56" }, Matched { key: "log_level", value: "INFO" }, Matched { key: "username", value: "alice" }, Matched { key: "ip_address", value: "192.168.1.10" }]
+### OUTPUT
+```log
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] Starting main...
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] Test String 1: [INFO] User alice logged in from IP address 192.168.1.10.
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] Test Pattern 1: [<log_level:word>] User <username:word> logged in from IP address <ip_address:ip>.
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] [Matched { key: "log_level", value: "INFO" }, Matched { key: "username", value: "alice" }, Matched { key: "ip_address", value: "192.168.1.10" }]
+    
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] Test String 2: 2024-01-14 12:34:56 [INFO] User alice logged in from IP address 192.168.1.10.
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] Test Pattern 2: <log_time:date_time> [<log_level:word>] User <username:word> logged in from IP address <ip_address:ip>.
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] [Matched { key: "log_time", value: "2024-01-14 12:34:56" }, Matched { key: "log_level", value: "INFO" }, Matched { key: "username", value: "alice" }, Matched { key: "ip_address", value: "192.168.1.10" }]
+    
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] Test String 3: [INFO] User dipak logged in from IP address 136.24.10.44
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] Test Pattern 3: [<log_level:word>] User <username:word> logged in from IP address <ip_address:ip>.
+[2024-01-15T07:49:12Z INFO  custom_pattern_matcher] [Matched { key: "log_level", value: "INFO" }, Matched { key: "username", value: "dipak" }, Matched { key: "ip_address", value: "136.24.10" }]
 ```
 
 #### Note: This is just for experimental purpose not the production ready. One should optimize this and handle errors to use for production. 
