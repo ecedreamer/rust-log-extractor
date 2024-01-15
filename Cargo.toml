@@ -1,5 +1,5 @@
 [package]
-name = "custom_pattern_matcher"
+name = "rust_log_extractor"
 version = "0.1.0"
 edition = "2021"
 
