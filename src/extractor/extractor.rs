@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use linked_hash_map::LinkedHashMap;
 use log::debug;
 use regex::{Regex, self};
 use std::sync::Mutex;
@@ -12,7 +13,7 @@ pub struct Matched {
 }
 
 lazy_static! {
-    static ref PATTERN_CACHE: Mutex<HashMap<String, Regex>> = Mutex::new(HashMap::new());
+    static ref PATTERN_CACHE: Mutex<LinkedHashMap<String, Regex>> = Mutex::new(LinkedHashMap::new());
 }
 
 fn get_compiled_regex_pattern(regex_pattern: &str) -> Result<Regex, String> {
@@ -33,6 +34,10 @@ fn get_compiled_regex_pattern(regex_pattern: &str) -> Result<Regex, String> {
             Ok(compiled_pattern) => {
                 cache.insert(regex_pattern.to_string(), compiled_pattern.clone());
                 debug!("Cache; newly compiled pattern; inserted to cache; -----------------");
+                if cache.len() > 100 {
+                    cache.pop_front();
+                    debug!("Cache; newly compiled pattern; removed from cache; -----------------");
+                }
                 Ok(compiled_pattern)
             }
             Err(error) => Err(format!("Error: {}", error)),
