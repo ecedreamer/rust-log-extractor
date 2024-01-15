@@ -1,9 +1,36 @@
 use std::collections::HashMap;
+use log::debug;
+use regex::{Regex, self};
+use std::sync::Mutex;
+use lazy_static::lazy_static;
+
 
 #[derive(Debug, PartialEq)]
 pub struct Matched {
     pub key: String,
     pub value: String
+}
+
+lazy_static! {
+    static ref PATTERN_CACHE: Mutex<HashMap<String, Regex>> = Mutex::new(HashMap::new());
+}
+
+fn get_compiled_regex_pattern(regex_pattern: &str) -> Result<Regex, String> {
+    let mut cache = PATTERN_CACHE.lock().unwrap();
+
+    if let Some(compiled_pattern) = cache.get(regex_pattern) {
+        debug!("Cache; found in cache; got from the cache; -----------------");
+        Ok(compiled_pattern.clone())
+    } else {
+        match Regex::new(regex_pattern) {
+            Ok(compiled_pattern) => {
+                cache.insert(regex_pattern.to_string(), compiled_pattern.clone());
+                debug!("Cache; newly compiled pattern; inserted to cache; -----------------");
+                Ok(compiled_pattern)
+            }
+            Err(error) => Err(format!("Error: {}", error)),
+        }
+    }
 }
 
 fn get_key_to_regex_map<'a>() -> HashMap<&'a str, &'a str> {
@@ -37,7 +64,7 @@ fn get_keys_info(pattern: &str) -> HashMap<String, String> {
     key_list
 }
 
-fn convert_pattern_to_regex(pattern: &str) -> String{
+fn convert_pattern_to_regex_pattern(pattern: &str) -> String{
     let keys_info = get_keys_info(&pattern);
 
     let mut final_string = pattern.to_string();
@@ -51,15 +78,13 @@ fn convert_pattern_to_regex(pattern: &str) -> String{
         );
     }
     format!(r"{final_string}")
-
 }
-
 
 pub fn parse_info(input_str: &str, pattern: &str) -> Result<Vec<Matched>, String> {
     let mut parsed_info: Vec<Matched> = vec![];
-    let regex_pattern = convert_pattern_to_regex(pattern);
+    let regex_pattern = convert_pattern_to_regex_pattern(pattern);
 
-    let compiled_pattern = regex::Regex::new(&regex_pattern).expect("Could not convert pattern");
+    let compiled_pattern = get_compiled_regex_pattern(&regex_pattern).expect("Could not convert pattern");
 
     if let Some(captures) = compiled_pattern.captures(input_str) {
         for name in compiled_pattern.capture_names().filter_map(|n| n) {

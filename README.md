@@ -2,9 +2,25 @@
 
 The Log Extractor is a Rust project that provides a module (extractor) for parsing log messages using custom patterns. It allows you to define patterns for log messages and extract relevant information such as log level, timestamp, username, and IP address.
 
+### Clone the project and go in to the project directory. ####
+
+```sh
+projects % git clone https://github.com/ecedreamer/rust-log-extractor.git
+projects % cd custom_pattern_matcher
+```
+#### To run it ####
+```sh
+custom_pattern_matcher % ./run.sh
+
+# or 
+
+custom_pattern_matcher % RUST_LOG=info cargo run --release
+
+```
+
 
 ### Defining Patterns
-The Log Extractor uses custom patterns to define the structure of log messages. You can specify placeholders like <log_level:word>, <username:word>, <ip_address:ip>, and <log_time:date_time>, and the extractor will attempt to match and extract information accordingly.
+The Log Extractor uses custom patterns to define the structure of log messages. The general pattern is `<key_name:data_type>`.Since this is just for the experiment, only couple of datatypes are available. You can specify placeholders like `<log_level:word>`, `<username:word>`, `<ip_address:ip>`, and `<log_time:date_time>`, and the extractor will attempt to match and extract information accordingly.
 
 ### Examples
 #### test Case 1
