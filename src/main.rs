@@ -1,5 +1,5 @@
 use log::{info, error};
-
+use std::time::Instant;
 mod extractor;
 
 
@@ -43,4 +43,20 @@ fn main() {
         },
         Err(error) => error!("Error: {}\n", error)
     }
+
+    // testing performance of 
+    let start_time = Instant::now();
+    let mut success_result = 0;
+    let mut fail_result = 0;
+    for _ in 1..10001 {
+        let test_string_3 = "[INFO] User dipak logged in from IP address 136.24.10.44";
+        let test_pattern_3 = "[<log_level:word>] User <username:word> logged in from IP address <ip_address:ip>.";
+        match extractor::extractor::parse_info(test_string_3, test_pattern_3) {
+            Ok(_) => success_result += 1,
+            Err(_) => fail_result += 1
+        }
+    }
+    let elapsed_time = start_time.elapsed();
+    println!("Success Result: {success_result}; Fail Result: {fail_result}, {elapsed_time:?}");
+    
 }
