@@ -17,13 +17,6 @@ lazy_static! {
 }
 
 fn get_compiled_regex_pattern(regex_pattern: &str) -> Result<Regex, String> {
-    // match Regex::new(regex_pattern) {
-    //     Ok(compiled_pattern) => {
-    //         debug!("Cache; newly compiled pattern; inserted to cache; -----------------");
-    //         Ok(compiled_pattern)
-    //     }
-    //     Err(error) => Err(format!("Error: {}", error)),
-    // }
     let mut cache = PATTERN_CACHE.lock().unwrap();
 
     if let Some(compiled_pattern) = cache.get(regex_pattern) {
@@ -97,7 +90,6 @@ pub fn parse_info(input_str: &str, pattern: &str) -> Result<Vec<Matched>, String
     let regex_pattern = convert_pattern_to_regex_pattern(pattern);
 
     let compiled_pattern = get_compiled_regex_pattern(&regex_pattern).expect("Could not convert pattern");
-
     if let Some(captures) = compiled_pattern.captures(input_str) {
         for name in compiled_pattern.capture_names().filter_map(|n| n) {
             if let Some(matched) = captures.name(name) {
