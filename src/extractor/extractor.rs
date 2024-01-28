@@ -69,7 +69,7 @@ fn get_keys_info(pattern: &str) -> HashMap<String, String> {
     key_list
 }
 
-fn convert_pattern_to_regex_pattern(pattern: &str) -> String{
+pub fn convert_pattern_to_regex_pattern(pattern: &str) -> String{
     let keys_info = get_keys_info(&pattern);
 
     let mut final_string = pattern.to_string();
@@ -88,6 +88,22 @@ fn convert_pattern_to_regex_pattern(pattern: &str) -> String{
 pub fn parse_info(input_str: &str, pattern: &str) -> Result<Vec<Matched>, String> {
     let mut parsed_info: Vec<Matched> = vec![];
     let regex_pattern = convert_pattern_to_regex_pattern(pattern);
+
+    let compiled_pattern = get_compiled_regex_pattern(&regex_pattern).expect("Could not convert pattern");
+    if let Some(captures) = compiled_pattern.captures(input_str) {
+        for name in compiled_pattern.capture_names().filter_map(|n| n) {
+            if let Some(matched) = captures.name(name) {
+                parsed_info.push(Matched{key: name.to_string(), value: matched.as_str().to_string()});
+            }
+        }
+        Ok(parsed_info)
+    } else {
+        Err("Could not parse infomation".to_string())
+    }
+}
+
+pub fn parse_info_with_regex_pattern(input_str: &str, regex_pattern: &str) -> Result<Vec<Matched>, String> {
+    let mut parsed_info: Vec<Matched> = vec![];
 
     let compiled_pattern = get_compiled_regex_pattern(&regex_pattern).expect("Could not convert pattern");
     if let Some(captures) = compiled_pattern.captures(input_str) {
